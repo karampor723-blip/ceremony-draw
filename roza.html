@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>قرعه کشی نوبت مراسم</title>
+    
+    <style>
+        @import url('https://cdn.fontcdn.ir/Font/Persian/Morabba/Morabba.css');
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Morabba', Tahoma, Arial, sans-serif;
+            background: radial-gradient(circle at top right, #1a1a3e, #0f0f1a, #0a0a12);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100dvh; /* dvh برای مشکل Safari موبایل */
+            color: #ffffff;
+            overflow-x: hidden; /* فقط اسکرول افقی بسته */
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* در موبایل blob ها رو کوچک‌تر و سبک‌تر می‌کنیم */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: float 10s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+        .blob-1 {
+            width: 200px;
+            height: 200px;
+            background: rgba(108, 92, 231, 0.4);
+            top: -80px;
+            right: -80px;
+        }
+        .blob-2 {
+            width: 220px;
+            height: 220px;
+            background: rgba(0, 206, 201, 0.3);
+            bottom: -100px;
+            left: -100px;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, -20px) scale(1.05); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            position: relative;
+            z-index: 1;
+            margin: 10px 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #00cec9;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #d1d1d1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .auto-generate-section {
+            background: rgba(108, 92, 231, 0.1);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 18px;
+        }
+
+        .auto-generate-section label {
+            color: #74b9ff;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .auto-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: 'Morabba', Tahoma, sans-serif;
+            font-size: 16px; /* حداقل 16px برای جلوگیری از زوم iOS */
+            font-weight: 500;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: rgba(108, 92, 231, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .auto-controls span {
+            color: #d1d1d1;
+            font-size: 13px;
+        }
+
+        .btn-small {
+            padding: 12px 14px;
+            font-size: 14px;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 130px;
+            min-height: 44px; /* حداقل ارتفاع برای لمس راحت */
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #00cec9 0%, #6c5ce7 100%);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            font-family: 'Morabba', Tahoma, sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            resize: vertical;
+            direction: rtl;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            min-height: 100px;
+            line-height: 1.7;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+            font-size: 13px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(108, 92, 231, 0.6);
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        button {
+            background: linear-gradient(135deg, #6c5ce7 0%, #00cec9 100%); 
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 17px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Morabba', Tahoma, sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            letter-spacing: -1px;
+            min-height: 48px; /* دکمه بزرگ برای لمس */
+            touch-action: manipulation;
+        }
+
+        button:hover, button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(0, 206, 201, 0.08);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 206, 201, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .result-box.show {
+            opacity: 1;
+        }
+        
+        .result-box h3 {
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-align: center;
+            color: #00cec9;
+            margin: 0 0 15px 0;
+            font-size: 17px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 14px;
+            font-weight: 500;
+            gap: 8px;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .day {
+            font-weight: 700;
+            color: #74b9ff;
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .arrow {
+            color: rgba(255,255,255,0.3);
+            flex-shrink: 0;
+        }
+
+        .name {
+            color: #ff7675; 
+            font-weight: 700;
+            text-align: left;
+            flex-shrink: 0;
+            max-width: 45%;
+            font-size: 14px;
+        }
+
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 700;
+            font-size: 14px;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            display: none;
+            line-height: 1.7;
+        }
+
+        /* ===== ریسپانسیو برای موبایل‌های کوچک ===== */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+            }
+
+            .container {
+                padding: 18px 15px;
+                border-radius: 16px;
+                margin: 5px 0;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+                margin-bottom: 15px;
+            }
+
+            .auto-generate-section {
+                padding: 10px;
+            }
+
+            .auto-controls {
+                gap: 6px;
+            }
+
+            input[type="number"] {
+                width: 60px;
+                padding: 10px 5px;
+                font-size: 16px;
+            }
+
+            .auto-controls span {
+                font-size: 12px;
+            }
+
+            .btn-small {
+                font-size: 13px;
+                padding: 10px;
+                min-width: 110px;
+            }
+
+            textarea {
+                font-size: 14px;
+                padding: 10px;
+                min-height: 90px;
+            }
+
+            textarea::placeholder {
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 12px 15px;
+            }
+
+            .result-item {
+                padding: 8px 2px;
+                font-size: 13px;
+            }
+
+            .day {
+                font-size: 12px;
+            }
+
+            .name {
+                font-size: 13px;
+                max-width: 42%;
+            }
+
+            .blob {
+                filter: blur(60px); /* blur کمتر برای performance */
+            }
+            .blob-1 { width: 150px; height: 150px; }
+            .blob-2 { width: 170px; height: 170px; }
+        }
+
+        /* ===== برای گوشی‌های خیلی کوچک ===== */
+        @media (max-width: 360px) {
+            .container {
+                padding: 15px 12px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .name {
+                max-width: 100%;
+                text-align: right;
+            }
+
+            .arrow {
+                display: none;
+            }
+        }
+
+        /* حالت landscape در موبایل */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 8px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 18px;
+                margin-bottom: 3px;
+            }
+            .subtitle {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <h1>قرعه‌کشی نوبت مراسم</h1>
+        <div class="subtitle">📅 روزهای فرد ماه + جمعه‌ها</div>
+        
+        <div class="auto-generate-section">
+            <label>🎯 تولید خودکار روزهای مراسم:</label>
+            <div class="auto-controls">
+                <input type="number" id="daysCount" value="10" min="1" max="100" inputmode="numeric">
+                <span>روز آینده</span>
+                <button class="btn-small btn-secondary" onclick="autoGenerateDays()">✨ تولید</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>۱. روزهای مراسم:</label>
+            <textarea id="daysInput" rows="5" placeholder="روی دکمه 'تولید' بزنید یا دستی وارد کنید..."></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>۲. اسامی ثبت‌نام‌کنندگان (هر نام در یک خط):</label>
+            <textarea id="namesInput" rows="5" placeholder="مثال:
+علی رضایی
+حسین محمدی
+رضا احمدی"></textarea>
+        </div>
+
+        <button onclick="drawLots()">🎲 گرداندن قرعه</button>
+        
+        <div id="errorBox" class="error"></div>
+
+        <div id="resultBox" class="result-box"></div>
+    </div>
+
+    <script>
+        function autoGenerateDays() {
+            const count = parseInt(document.getElementById('daysCount').value);
+            if (!count || count < 1) {
+                showError('لطفاً تعداد معتبر وارد کنید.');
+                return;
+            }
+
+            const ceremonyDays = generateCeremonyDays(count);
+            document.getElementById('daysInput').value = ceremonyDays.join('\n');
+            document.getElementById('errorBox').style.display = 'none';
+            
+            // بستن کیبورد بعد از تولید
+            document.activeElement.blur();
+        }
+
+        function generateCeremonyDays(count) {
+            const days = [];
+            const today = new Date();
+            const d = new Date(today);
+            
+            while (days.length < count) {
+                const persianDate = new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                }).format(d);
+                
+                const persianDay = parseInt(new Intl.DateTimeFormat('fa-IR-u-nu-latn', {
+                    day: 'numeric'
+                }).format(d));
+                
+                const dayOfWeek = d.getDay();
+                const isOddDay = persianDay % 2 === 1;
+                const isFriday = dayOfWeek === 5;
+                
+                if (isOddDay || isFriday) {
+                    days.push(persianDate);
+                }
+                
+                d.setDate(d.getDate() + 1);
+            }
+            
+            return days;
+        }
+
+        function drawLots() {
+            document.getElementById('errorBox').innerText = "";
+            document.getElementById("errorBox").style.display = "none";
+            
+            const daysText = document.getElementById("daysInput").value.trim();
+            const namesText = document.getElementById("namesInput").value.trim();
+            const resultBox = document.getElementById("resultBox");
+
+            if (!daysText || !namesText) {
+                showError("لطفاً هم روزها و هم اسامی را وارد کنید.");
+                return;
+            }
+
+            let days = daysText.split('\n').map(item => item.trim()).filter(item => item !== '');
+            let names = namesText.split('\n').map(item => item.trim()).filter(item => item !== '');
+
+            if (names.length > days.length) {
+                showError(`تعداد افراد (${names.length} نفر) بیشتر از روزهای مراسم (${days.length} روز) است!`);
+                return;
+            }
+
+            const shuffledNames = [...names];
+            for (let i = shuffledNames.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledNames[i], shuffledNames[j]] = [shuffledNames[j], shuffledNames[i]];
+            }
+
+            let htmlContent = "<h3>🎯 نتیجه قرعه‌کشی:</h3>";
+            
+            for (let i = 0; i < shuffledNames.length; i++) {
+                htmlContent += `
+                    <div class="result-item">
+                        <span class="day">${days[i]}</span>
+                        <span class="arrow">←</span>
+                        <span class="name">${shuffledNames[i]}</span>
+                    </div>
+                `;
+            }
+
+            resultBox.classList.remove("show");
+            setTimeout(() => {
+                resultBox.innerHTML = htmlContent;
+                resultBox.classList.add("show");
+                // اسکرول نرم به نتایج
+                resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById("errorBox");
+            errorBox.innerText = message;
+            errorBox.style.display = "block";
+            document.getElementById("resultBox").classList.remove("show");
+            document.getElementById("resultBox").innerHTML = "";
+        }
+    </script>
+
+</body>
+</html>
